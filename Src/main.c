@@ -489,6 +489,82 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
+int readPad (){
+	
+	int keymap[4][3]=
+	{
+	{1, 2, 3},
+	{4, 5, 6},
+	{7, 8, 9},
+	{10, 0, 11}
+	};
+	
+	for (int i = 0; i < 4; i++){
+		switch (i) {
+			case 0 : 
+				HAL_GPIO_WritePin(GPIOC, Row_1_Pin, GPIO_PIN_SET);
+				if (HAL_GPIO_ReadPin(GPIOE, Col_1_Pin) == 1){
+					return keymap [i][0];
+				}
+				else if (HAL_GPIO_ReadPin(GPIOE, Col_2_Pin) == 1){
+					return keymap [i][1];
+				}
+				else if (HAL_GPIO_ReadPin(GPIOE, Col_3_Pin) == 1){
+					return keymap [i][2];
+				}
+				HAL_GPIO_WritePin(GPIOC, Row_1_Pin, GPIO_PIN_RESET);
+			break;
+			
+			case 1:
+				HAL_GPIO_WritePin(GPIOC, Row_2_Pin, GPIO_PIN_SET);
+				if (HAL_GPIO_ReadPin(GPIOE, Col_1_Pin) == 1){
+					return keymap [i][0];
+				}
+				else if (HAL_GPIO_ReadPin(GPIOE, Col_2_Pin) == 1){
+					return keymap [i][1];
+				}
+				else if (HAL_GPIO_ReadPin(GPIOE, Col_3_Pin) == 1){
+					return keymap [i][2];
+				}
+				HAL_GPIO_WritePin(GPIOC, Row_1_Pin, GPIO_PIN_RESET);
+			break;
+			
+			case 2:
+				HAL_GPIO_WritePin(GPIOC, Row_2_Pin, GPIO_PIN_SET);
+				if (HAL_GPIO_ReadPin(GPIOE, Col_1_Pin) == 1){
+					return keymap [i][0];
+				}
+				else if (HAL_GPIO_ReadPin(GPIOE, Col_2_Pin) == 1){
+					return keymap [i][1];
+				}
+				else if (HAL_GPIO_ReadPin(GPIOE, Col_3_Pin) == 1){
+					return keymap [i][2];
+				}
+				HAL_GPIO_WritePin(GPIOC, Row_1_Pin, GPIO_PIN_RESET);
+			break;
+			
+			case 3:
+				HAL_GPIO_WritePin(GPIOC, Row_3_Pin, GPIO_PIN_SET);
+				if (HAL_GPIO_ReadPin(GPIOE, Col_1_Pin) == 1){
+					return keymap [i][0];
+				}
+				else if (HAL_GPIO_ReadPin(GPIOE, Col_2_Pin) == 1){
+					return keymap [i][1];
+				}
+				else if (HAL_GPIO_ReadPin(GPIOE, Col_3_Pin) == 1){
+					return keymap [i][2];
+				}
+				HAL_GPIO_WritePin(GPIOC, Row_1_Pin, GPIO_PIN_RESET);
+			break;
+			
+			default:
+			break;
+			
+		}
+	}
+}
+
+
 /* USER CODE END 4 */
 
 /**
