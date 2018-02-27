@@ -51,7 +51,7 @@
 #include "usb_host.h"
 
 /* USER CODE BEGIN Includes */
-
+#include <math.h>
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -67,6 +67,18 @@ TIM_HandleTypeDef htim3;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
+
+int sampleNB = 100; //CHANGE FOR SAMPLE NUMBER
+int sample = 0;
+
+#define MATH_ARRAY_SIZE 5
+int displayMode = 0;
+float filterMemory [] = {0, 0, 0, 0, 0};
+int adc_val;
+float filtered_adc;
+float mathResults [MATH_ARRAY_SIZE];
+extern uint8_t systickFlag;
+extern uint8_t buttonFlag;
 
 /* USER CODE END PV */
 
@@ -85,6 +97,13 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
+
+void FIR_C(float input, float *output);
+int buttonPressed(void);
+void displayNum (int num, int pos);
+void C_math (float * inputArray, float * outputArray, int length);
+void display (int mode, float num);
+int readPad (void);
 
 /* USER CODE END PFP */
 
@@ -558,11 +577,276 @@ int readPad (){
 			break;
 			
 			default:
+				
 			break;
 			
 		}
 	}
+	return -1;
 }
+
+/**
+  * @brief  This function displays a integer on one of the digits of a 7 segiment, 4 digit led display
+	* @param  num: integer number to be displayed 
+						pos: the location in a 4 digit display,
+  * @retval none
+  */
+void displayNum (int num, int pos) {       //function used to diplay a single digit on LED segments
+	switch (num){
+		case 0:
+			HAL_GPIO_WritePin(GPIOD, Seg_A_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, Seg_B_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, Seg_C_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, Seg_D_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOB, Seg_E_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOB, Seg_F_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOB, Seg_G_Pin, GPIO_PIN_RESET);
+			break;
+		case 1:
+			HAL_GPIO_WritePin(GPIOD, Seg_A_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOD, Seg_B_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, Seg_C_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, Seg_D_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, Seg_E_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, Seg_F_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, Seg_G_Pin, GPIO_PIN_RESET);
+			break;
+		case 2:
+			HAL_GPIO_WritePin(GPIOD, Seg_A_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, Seg_B_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, Seg_C_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOD, Seg_D_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOB, Seg_E_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOB, Seg_F_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, Seg_G_Pin, GPIO_PIN_SET);
+			break;
+		
+		case 3:
+			HAL_GPIO_WritePin(GPIOD, Seg_A_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, Seg_B_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, Seg_C_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, Seg_D_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOB, Seg_E_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, Seg_F_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, Seg_G_Pin, GPIO_PIN_SET);
+			break;
+		
+		case 4:
+			HAL_GPIO_WritePin(GPIOD, Seg_A_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOD, Seg_B_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, Seg_C_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, Seg_D_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, Seg_E_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, Seg_F_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOB, Seg_G_Pin, GPIO_PIN_SET);
+			break;
+		
+		case 5:
+			HAL_GPIO_WritePin(GPIOD, Seg_A_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, Seg_B_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOD, Seg_C_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, Seg_D_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOB, Seg_E_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, Seg_F_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOB, Seg_G_Pin, GPIO_PIN_SET);
+			break;
+		
+		case 6:
+			HAL_GPIO_WritePin(GPIOD, Seg_A_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, Seg_B_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOD, Seg_C_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, Seg_D_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOB, Seg_E_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOB, Seg_F_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOB, Seg_G_Pin, GPIO_PIN_SET);
+			break;
+		
+		case 7:
+			HAL_GPIO_WritePin(GPIOD, Seg_A_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, Seg_B_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, Seg_C_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, Seg_D_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, Seg_E_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, Seg_F_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, Seg_G_Pin, GPIO_PIN_RESET);
+			break;
+		
+		case 8:
+			HAL_GPIO_WritePin(GPIOD, Seg_A_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, Seg_B_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, Seg_C_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, Seg_D_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOB, Seg_E_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOB, Seg_F_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOB, Seg_G_Pin, GPIO_PIN_SET);
+			break;
+		case 9:
+			HAL_GPIO_WritePin(GPIOD, Seg_A_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, Seg_B_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, Seg_C_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, Seg_D_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, Seg_E_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, Seg_F_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOB, Seg_G_Pin, GPIO_PIN_SET);
+			break;
+		default :
+			break;
+	}
+		
+		switch (pos){
+			case 0:
+				HAL_GPIO_WritePin(GPIOE, Dig_1_Pin, GPIO_PIN_SET);
+				HAL_GPIO_WritePin(GPIOE, Dig_2_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOE, Dig_L_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOE, Dig_3_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOE, Dig_4_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOB, Seg_DP_Pin, GPIO_PIN_RESET);
+			break;
+			case 1:
+				HAL_GPIO_WritePin(GPIOE, Dig_1_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOE, Dig_2_Pin, GPIO_PIN_SET);
+				HAL_GPIO_WritePin(GPIOE, Dig_L_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOE, Dig_3_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOE, Dig_4_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOB, Seg_DP_Pin, GPIO_PIN_SET);
+			break;
+			case 2:
+				HAL_GPIO_WritePin(GPIOE, Dig_1_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOE, Dig_2_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOE, Dig_L_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOE, Dig_3_Pin, GPIO_PIN_SET);
+				HAL_GPIO_WritePin(GPIOE, Dig_4_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOB, Seg_DP_Pin, GPIO_PIN_RESET);
+			break;
+			case 3 :
+				HAL_GPIO_WritePin(GPIOE, Dig_1_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOE, Dig_2_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOE, Dig_L_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOE, Dig_3_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOE, Dig_4_Pin, GPIO_PIN_SET);
+				HAL_GPIO_WritePin(GPIOB, Seg_DP_Pin, GPIO_PIN_RESET);
+			break;
+			default :
+				break;
+		}
+	
+}
+/**
+  * @brief  This is the FIR function from LAB 1
+						Filters data using FIR to eliminate unwanted noise
+	* @param  Input: data to be filtered
+						Output: filtered data
+  * @retval none
+  */
+void FIR_C(float Input, float *Output) {   
+	float coef [] = {0.2, 0.2, 0.2, 0.2, 0.2};          //coefficients -> SHOULD ADD UP TO 1 !
+	float out = 0.0;
+	for (int i = 4; i>0; i--){
+		filterMemory[i] = filterMemory[i-1];
+	}
+	filterMemory [0] = Input;
+	for (int i = 0; i<5; i++){
+		out += coef[i]*filterMemory[i];
+	}
+	*Output = out;
+}
+
+
+/**
+  * @brief  This is the C?math function from lab1
+						calculates rms, max, min, min index, and max index from the given array
+	* @param  inputArray: contains the samples to be analyzed
+						outputArray: contains the array where the results are stored
+						length: length of the input array
+  * @retval none
+  */
+void C_math (float * inputArray, float * outputArray, int length){      //C_math function from lab 1
+
+	float RMS=0;
+	float maxVal = inputArray[0];
+	float minVal = inputArray[0];
+	int maxInd = 0;
+	int minInd = 0;
+	
+	
+	for (int i = 0; i< (length); i++){
+		
+		RMS += (inputArray[i])*(inputArray[i]);
+		
+		if ((inputArray[i]) > maxVal){
+			maxVal = inputArray[i];
+			maxInd = i;
+		}
+		if ((inputArray[i]) < minVal){
+			minVal = (inputArray[i]);
+			minInd = i;
+		}
+	}
+	
+	RMS = RMS/length;
+	RMS = sqrt(RMS);
+	
+	outputArray [0]=RMS;
+	outputArray [1]= maxVal;
+	outputArray [2]= minVal;
+	outputArray [3]= maxInd;
+	outputArray [4]= minInd;
+	
+}
+
+/**
+  * @brief  detects a blue button press
+  * @param  none
+  * @retval returns 1 when button is pressed
+						0 otherwise
+  */
+/*
+int buttonPressed(){    
+	if ( HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0 ) == SET) {
+		HAL_Delay(200);
+		printf("button (pulled)!");
+		return 1;
+	}
+	else 
+	{
+		return 0;
+	}
+}
+*/
+/**
+  * @brief  function used to display a float value on the LED segments
+  * @param  num: the floating number to be displayed at digits 1, 2, and 3
+*         	mode: the int thats displayed at the firist digit to indicate rms/min/max mode 
+  * @retval None
+  */
+void display (int mode, float num){     //
+	
+	
+	displayNum (mode, 0); //display mode at location 0 (first LED display)
+	HAL_Delay(1);
+	
+	float temp = num;
+	int digit = (int) num;
+	
+	
+	digit = digit % 10;
+	displayNum (digit, 1); //display unit at location 1
+	HAL_Delay(1);
+	
+	temp = num*10;
+	digit = (int) temp;
+	digit = digit % 10;
+	displayNum (digit, 2); //display digit at location 2
+	HAL_Delay(1);
+	
+	temp = num*100;
+	digit = (int) temp;
+	digit = digit % 10;
+	displayNum (digit, 3); //display digit at location 3
+	HAL_Delay(1);
+}
+
+
 
 
 /* USER CODE END 4 */
