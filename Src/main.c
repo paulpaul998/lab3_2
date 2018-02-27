@@ -80,6 +80,9 @@ float mathResults [MATH_ARRAY_SIZE];
 extern uint8_t systickFlag;
 extern uint8_t buttonFlag;
 
+int padEntries [] = {0, 0, 0, 0};
+int padVal;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -104,6 +107,7 @@ void displayNum (int num, int pos);
 void C_math (float * inputArray, float * outputArray, int length);
 void display (int mode, float num);
 int readPad (void);
+void updateEnt (int newEnt);
 
 /* USER CODE END PFP */
 
@@ -119,7 +123,18 @@ int readPad (void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -154,7 +169,18 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
+		
+		padVal = readPad();
+		if (padVal != -1) {
+			updateEnt (padVal);
+		}
+		
+		for (int i = 0; i<4; i++){
+			displayNum (padEntries[i], i);
+		}
+		
+		
+		
   /* USER CODE END WHILE */
     MX_USB_HOST_Process();
 
@@ -846,7 +872,13 @@ void display (int mode, float num){     //
 	HAL_Delay(1);
 }
 
-
+void updateEnt (int newEnt) {
+	
+	for (int i = 3; i>0; i++){
+		padEntries[i] = padEntries [i-1];
+	}
+	padEntries [0] = newEnt;
+}
 
 
 /* USER CODE END 4 */
