@@ -171,14 +171,19 @@ int main(void)
   {
 		
 		padVal = readPad();
+		
+		printf ("%d /n", padVal);
+		
 		if (padVal != -1) {
 			updateEnt (padVal);
 		}
 		
 		for (int i = 0; i<4; i++){
 			displayNum (padEntries[i], i);
+			HAL_Delay(1);
 		}
 		
+		HAL_Delay(3);
 		
 		
   /* USER CODE END WHILE */
