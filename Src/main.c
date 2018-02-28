@@ -178,13 +178,13 @@ int main(void)
 			updateEnt (padVal);
 		}
 		
-		displayNum (padEntries[0], 0);
+		displayNum (padEntries[0], 3);
 		HAL_Delay(1);
-		displayNum (padEntries[1], 1);
+		displayNum (padEntries[1], 2);
 		HAL_Delay(1);
-		displayNum (padEntries[2], 2);
+		displayNum (padEntries[2], 1);
 		HAL_Delay(1);
-		displayNum (padEntries[3], 3);
+		displayNum (padEntries[3], 0);
 		
 		
 		
