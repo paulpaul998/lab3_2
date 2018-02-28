@@ -3,7 +3,7 @@
 <title>Static Call Graph - [lab3_2\lab3_2.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image lab3_2\lab3_2.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Tue Feb 27 18:12:21 2018
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Tue Feb 27 19:35:24 2018
 <BR><P>
 <H3>Maximum Stack Usage =        300 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -530,6 +530,8 @@ Global Symbols
 <LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USB_SetCurrentMode
 <LI><a href="#[9e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USB_ResetPort
 <LI><a href="#[9a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USB_HostInit
+<LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;readPad
+<LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
 <P><STRONG><a name="[79]"></a>HAL_GPIO_Init</STRONG> (Thumb, 388 bytes, Stack size 40 bytes, stm32f4xx_hal_gpio.o(i.HAL_GPIO_Init))
@@ -1538,10 +1540,11 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[62]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USBH_CDC_InterfaceDeInit
 </UL>
 
-<P><STRONG><a name="[5b]"></a>main</STRONG> (Thumb, 78 bytes, Stack size 0 bytes, main.o(i.main))
+<P><STRONG><a name="[5b]"></a>main</STRONG> (Thumb, 116 bytes, Stack size 0 bytes, main.o(i.main))
 <BR><BR>[Stack]<UL><LI>Max Depth = 300<LI>Call Chain = main &rArr; MX_USB_HOST_Process &rArr; USBH_Process &rArr; USBH_HandleEnum &rArr; USBH_Get_StringDesc &rArr; USBH_GetDescriptor &rArr; USBH_CtlReq &rArr; USBH_HandleControl &rArr; USBH_CtlSendData &rArr; USBH_LL_SubmitURB &rArr; HAL_HCD_HC_SubmitRequest &rArr; USB_HC_StartXfer &rArr; USB_WritePacket
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Init
+<LI><a href="#[7a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
 <LI><a href="#[df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_USB_HOST_Process
 <LI><a href="#[db]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_USB_HOST_Init
 <LI><a href="#[113]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;updateEnt
@@ -1563,11 +1566,12 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[61]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USBH_CDC_InterfaceInit
 </UL>
 
-<P><STRONG><a name="[112]"></a>readPad</STRONG> (Thumb, 322 bytes, Stack size 80 bytes, main.o(i.readPad))
-<BR><BR>[Stack]<UL><LI>Max Depth = 80<LI>Call Chain = readPad
+<P><STRONG><a name="[112]"></a>readPad</STRONG> (Thumb, 480 bytes, Stack size 80 bytes, main.o(i.readPad))
+<BR><BR>[Stack]<UL><LI>Max Depth = 96<LI>Call Chain = readPad &rArr; HAL_Delay
 </UL>
 <BR>[Calls]<UL><LI><a href="#[d4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_WritePin
 <LI><a href="#[114]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_ReadPin
+<LI><a href="#[7a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
 <LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memcpy4
 </UL>
 <BR>[Called By]<UL><LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main

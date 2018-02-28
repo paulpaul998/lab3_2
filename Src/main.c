@@ -81,7 +81,7 @@ extern uint8_t systickFlag;
 extern uint8_t buttonFlag;
 
 int padEntries [] = {0, 0, 0, 0};
-int padVal;
+int padVal = 0;
 
 /* USER CODE END PV */
 
@@ -172,19 +172,65 @@ int main(void)
 		
 		padVal = readPad();
 		
-		printf ("%d /n", padVal);
+		//printf ("%d /n", padVal);
 		
-		if (padVal != -1) {
+		if (padVal >= 0 && padVal < 10) {
 			updateEnt (padVal);
 		}
 		
-		for (int i = 0; i<4; i++){
-			displayNum (padEntries[i], i);
-			HAL_Delay(1);
-		}
+		displayNum (padEntries[0], 0);
+		HAL_Delay(1);
+		displayNum (padEntries[1], 1);
+		HAL_Delay(1);
+		displayNum (padEntries[2], 2);
+		HAL_Delay(1);
+		displayNum (padEntries[3], 3);
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		HAL_Delay(3);
-		
 		
   /* USER CODE END WHILE */
     MX_USB_HOST_Process();
@@ -553,13 +599,17 @@ int readPad (){
 		switch (i) {
 			case 0 : 
 				HAL_GPIO_WritePin(GPIOC, Row_1_Pin, GPIO_PIN_SET);
+				HAL_Delay (1);
 				if (HAL_GPIO_ReadPin(GPIOE, Col_1_Pin) == 1){
+					HAL_GPIO_WritePin(GPIOC, Row_1_Pin, GPIO_PIN_RESET);
 					return keymap [i][0];
 				}
 				else if (HAL_GPIO_ReadPin(GPIOE, Col_2_Pin) == 1){
+					HAL_GPIO_WritePin(GPIOC, Row_1_Pin, GPIO_PIN_RESET);
 					return keymap [i][1];
 				}
 				else if (HAL_GPIO_ReadPin(GPIOE, Col_3_Pin) == 1){
+					HAL_GPIO_WritePin(GPIOC, Row_1_Pin, GPIO_PIN_RESET);
 					return keymap [i][2];
 				}
 				HAL_GPIO_WritePin(GPIOC, Row_1_Pin, GPIO_PIN_RESET);
@@ -567,44 +617,56 @@ int readPad (){
 			
 			case 1:
 				HAL_GPIO_WritePin(GPIOC, Row_2_Pin, GPIO_PIN_SET);
+				HAL_Delay (1);
 				if (HAL_GPIO_ReadPin(GPIOE, Col_1_Pin) == 1){
+					HAL_GPIO_WritePin(GPIOC, Row_2_Pin, GPIO_PIN_RESET);
 					return keymap [i][0];
 				}
 				else if (HAL_GPIO_ReadPin(GPIOE, Col_2_Pin) == 1){
+					HAL_GPIO_WritePin(GPIOC, Row_2_Pin, GPIO_PIN_RESET);
 					return keymap [i][1];
 				}
 				else if (HAL_GPIO_ReadPin(GPIOE, Col_3_Pin) == 1){
+					HAL_GPIO_WritePin(GPIOC, Row_2_Pin, GPIO_PIN_RESET);
 					return keymap [i][2];
 				}
-				HAL_GPIO_WritePin(GPIOC, Row_1_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOC, Row_2_Pin, GPIO_PIN_RESET);
 			break;
 			
 			case 2:
-				HAL_GPIO_WritePin(GPIOC, Row_2_Pin, GPIO_PIN_SET);
+				HAL_GPIO_WritePin(GPIOB, Row_3_Pin, GPIO_PIN_SET);
+				HAL_Delay (1);
 				if (HAL_GPIO_ReadPin(GPIOE, Col_1_Pin) == 1){
+					HAL_GPIO_WritePin(GPIOB, Row_3_Pin, GPIO_PIN_RESET);
 					return keymap [i][0];
 				}
 				else if (HAL_GPIO_ReadPin(GPIOE, Col_2_Pin) == 1){
+					HAL_GPIO_WritePin(GPIOB, Row_3_Pin, GPIO_PIN_RESET);
 					return keymap [i][1];
 				}
 				else if (HAL_GPIO_ReadPin(GPIOE, Col_3_Pin) == 1){
+					HAL_GPIO_WritePin(GPIOB, Row_3_Pin, GPIO_PIN_RESET);
 					return keymap [i][2];
 				}
-				HAL_GPIO_WritePin(GPIOC, Row_1_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOB, Row_3_Pin, GPIO_PIN_RESET);
 			break;
 			
 			case 3:
-				HAL_GPIO_WritePin(GPIOC, Row_3_Pin, GPIO_PIN_SET);
+				HAL_GPIO_WritePin(GPIOB, Row_4_Pin, GPIO_PIN_SET);
+				HAL_Delay (1);
 				if (HAL_GPIO_ReadPin(GPIOE, Col_1_Pin) == 1){
+					HAL_GPIO_WritePin(GPIOB, Row_4_Pin, GPIO_PIN_RESET);
 					return keymap [i][0];
 				}
 				else if (HAL_GPIO_ReadPin(GPIOE, Col_2_Pin) == 1){
+					HAL_GPIO_WritePin(GPIOB, Row_4_Pin, GPIO_PIN_RESET);
 					return keymap [i][1];
 				}
 				else if (HAL_GPIO_ReadPin(GPIOE, Col_3_Pin) == 1){
+					HAL_GPIO_WritePin(GPIOB, Row_4_Pin, GPIO_PIN_RESET);
 					return keymap [i][2];
 				}
-				HAL_GPIO_WritePin(GPIOC, Row_1_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOB, Row_4_Pin, GPIO_PIN_RESET);
 			break;
 			
 			default:
