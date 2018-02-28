@@ -71,7 +71,16 @@ TIM_HandleTypeDef htim3;
 int sampleNB = 100; //CHANGE FOR SAMPLE NUMBER
 int sample = 0;
 
+
 #define MATH_ARRAY_SIZE 5
+#define WKEY1 0
+#define WKEY2 1
+#define WENTER 2
+#define DISPLAY 3
+#define SLEEP 4
+
+
+
 int displayMode = 0;
 float filterMemory [] = {0, 0, 0, 0, 0};
 int adc_val;
@@ -80,8 +89,12 @@ float mathResults [MATH_ARRAY_SIZE];
 extern uint8_t systickFlag;
 extern uint8_t buttonFlag;
 
+float dispNum = 0;
 int padEntries [] = {0, 0, 0, 0};
 int padVal = 0;
+int padFlag = 0;
+
+int state = WKEY1;
 
 /* USER CODE END PV */
 
@@ -161,7 +174,11 @@ int main(void)
   MX_USB_HOST_Init();
   MX_ADC1_Init();
   MX_TIM3_Init();
+	
   /* USER CODE BEGIN 2 */
+
+	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+
 
   /* USER CODE END 2 */
 
@@ -170,21 +187,98 @@ int main(void)
   while (1)
   {
 		
+		/*
+		TEST CODE
 		padVal = readPad();
-		
-		//printf ("%d /n", padVal);
 		
 		if (padVal >= 0 && padVal < 10) {
 			updateEnt (padVal);
 		}
 		
 		displayNum (padEntries[0], 3);
-		HAL_Delay(1);
+		HAL_Delay(2);
 		displayNum (padEntries[1], 2);
-		HAL_Delay(1);
+		HAL_Delay(2);
 		displayNum (padEntries[2], 1);
-		HAL_Delay(1);
+		HAL_Delay(2);
 		displayNum (padEntries[3], 0);
+		HAL_Delay(2);
+		*/
+		
+		
+		padVal = readPad();
+		dispNum = padEntries[0] + ((float)padEntries[1]/10);
+		
+		switch (state){
+			
+			case WKEY1:
+				display (-1, dispNum);
+				if (padVal >= 0 && padVal < 10 && padFlag == 0){
+					padEntries[0]=padVal;
+					padFlag = 1;
+				}
+				else if (padVal == -1 && padFlag == 1){
+					padFlag = 0;
+					state = WKEY2;
+				}
+			break;
+			
+			case WKEY2:
+				display (-1, dispNum);
+				if (padVal >= 0 && padVal < 10 && padFlag == 0){
+					padEntries[1]=padVal;
+					padFlag = 1;
+				}
+				else if (padVal == 10 && padFlag == 0){
+					padEntries[0] = 0;
+					padFlag = -1;
+				}
+				else if (padVal == -1){
+					if (padFlag == 1){
+						padFlag = 0;
+						state = WENTER;
+					}
+					else if (padFlag == -1){
+						padFlag = 0;
+						state = WKEY1;
+					}
+				}
+			break;
+			
+			case WENTER:
+				display (-1, dispNum);
+				if (padVal == 11 && padFlag == 0){
+					padFlag = 1;
+				}
+				else if (padVal == 10 && padFlag == 0){
+					padEntries[1] = 0;
+					padFlag = -1;
+				}
+				else if (padVal == -1){
+					if (padFlag == 1){
+						padFlag = 0;
+						state = DISPLAY;
+					}
+					else if (padFlag == -1){
+						padFlag = 0;
+						state = WKEY2;
+					}
+				}
+			break;
+			
+			case DISPLAY:
+				
+			break;
+			
+			case SLEEP:
+				
+			break;
+			
+			default :
+				
+			break;
+			
+		}
 		
 		
 		
@@ -228,9 +322,6 @@ int main(void)
 		
 		
 		
-		
-		
-		HAL_Delay(3);
 		
   /* USER CODE END WHILE */
     MX_USB_HOST_Process();
@@ -782,6 +873,15 @@ void displayNum (int num, int pos) {       //function used to diplay a single di
 			HAL_GPIO_WritePin(GPIOB, Seg_F_Pin, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(GPIOB, Seg_G_Pin, GPIO_PIN_SET);
 			break;
+		case -1:
+			HAL_GPIO_WritePin(GPIOD, Seg_A_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOD, Seg_B_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOD, Seg_C_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOD, Seg_D_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, Seg_E_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, Seg_F_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, Seg_G_Pin, GPIO_PIN_RESET);
+			break;
 		default :
 			break;
 	}
@@ -913,30 +1013,45 @@ int buttonPressed(){
   * @retval None
   */
 void display (int mode, float num){     //
-	
-	
-	displayNum (mode, 0); //display mode at location 0 (first LED display)
-	HAL_Delay(1);
-	
 	float temp = num;
 	int digit = (int) num;
 	
-	
-	digit = digit % 10;
-	displayNum (digit, 1); //display unit at location 1
-	HAL_Delay(1);
-	
-	temp = num*10;
-	digit = (int) temp;
-	digit = digit % 10;
-	displayNum (digit, 2); //display digit at location 2
-	HAL_Delay(1);
-	
-	temp = num*100;
-	digit = (int) temp;
-	digit = digit % 10;
-	displayNum (digit, 3); //display digit at location 3
-	HAL_Delay(1);
+	if (mode == -1){
+		displayNum (-1, 0);
+		displayNum (-1, 3);
+		
+		digit = digit % 10;
+		displayNum (digit, 1); //display unit at location 1
+		HAL_Delay(1);
+		
+		temp = num*10;
+		digit = (int) temp;
+		digit = digit % 10;
+		displayNum (digit, 2); //display digit at location 2
+		HAL_Delay(1);
+		
+	}
+	else{
+		displayNum (mode, 0); //display mode at location 0 (first LED display)
+		HAL_Delay(1);
+		
+		
+		digit = digit % 10;
+		displayNum (digit, 1); //display unit at location 1
+		HAL_Delay(1);
+		
+		temp = num*10;
+		digit = (int) temp;
+		digit = digit % 10;
+		displayNum (digit, 2); //display digit at location 2
+		HAL_Delay(1);
+		
+		temp = num*100;
+		digit = (int) temp;
+		digit = digit % 10;
+		displayNum (digit, 3); //display digit at location 3
+		HAL_Delay(1);
+	}
 }
 
 void updateEnt (int newEnt) {
