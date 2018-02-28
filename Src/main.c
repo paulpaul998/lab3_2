@@ -941,7 +941,7 @@ void display (int mode, float num){     //
 
 void updateEnt (int newEnt) {
 	
-	for (int i = 3; i>0; i++){
+	for (int i = 3; i>0; i--){
 		padEntries[i] = padEntries [i-1];
 	}
 	padEntries [0] = newEnt;
