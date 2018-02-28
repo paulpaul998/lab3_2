@@ -79,7 +79,8 @@ int sample = 0;
 #define DISPLAY 3
 #define SLEEP 4
 
-
+extern uint8_t systickFlag;
+extern uint8_t buttonFlag;
 
 int displayMode = 0;
 float filterMemory [] = {0, 0, 0, 0, 0};
@@ -138,7 +139,7 @@ int main(void)
   /* USER CODE BEGIN 1 */
 	
 	
-	
+	float data [sampleNB];
 	
 	
 	
@@ -206,6 +207,7 @@ int main(void)
 		*/
 		
 		
+		
 		padVal = readPad();
 		dispNum = padEntries[0] + ((float)padEntries[1]/10);
 		
@@ -267,6 +269,31 @@ int main(void)
 			break;
 			
 			case DISPLAY:
+				
+				if(systickFlag == 1){			
+					
+					systickFlag = 0;
+					
+					HAL_ADC_Start_IT(&hadc1);
+					adc_val = HAL_ADC_GetValue(&hadc1);
+					
+					float test = (float)adc_val*3.0/1023.0;
+					FIR_C(test, &filtered_adc);             //filter ADC value
+					data [sample] = filtered_adc;           //store filtered data in array
+				
+					sample ++;
+					sample = sample % sampleNB;
+				}
+				if ( buttonFlag == 1){
+					buttonFlag = 0;
+					displayMode = displayMode + 1;
+					displayMode = displayMode % 3;
+					printf("displayMode = %d \n!", displayMode);
+				}
+	
+				C_math (&data[0], &mathResults [0], sampleNB);                //perform math operation on data to get RMS, min and max values
+				
+				display (displayMode, mathResults [displayMode]);
 				
 			break;
 			
