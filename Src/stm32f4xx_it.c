@@ -37,6 +37,10 @@
 
 /* USER CODE BEGIN 0 */
 
+uint8_t systickFlag;
+uint8_t buttonFlag;
+int ms_counter = 0;
+
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
@@ -52,7 +56,13 @@ extern HCD_HandleTypeDef hhcd_USB_OTG_FS;
 void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
-
+	
+	ms_counter = ms_counter + 1;
+	if ( ms_counter >= 20 ){
+		ms_counter = 0;
+		systickFlag = 1;
+	}
+	
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   HAL_SYSTICK_IRQHandler();
@@ -74,7 +84,7 @@ void SysTick_Handler(void)
 void OTG_FS_IRQHandler(void)
 {
   /* USER CODE BEGIN OTG_FS_IRQn 0 */
-
+	
   /* USER CODE END OTG_FS_IRQn 0 */
   HAL_HCD_IRQHandler(&hhcd_USB_OTG_FS);
   /* USER CODE BEGIN OTG_FS_IRQn 1 */

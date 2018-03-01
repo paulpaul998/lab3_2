@@ -79,21 +79,19 @@ int sample = 0;
 #define DISPLAY 3
 #define SLEEP 4
 
-extern uint8_t systickFlag;
-extern uint8_t buttonFlag;
-
 int displayMode = 0;
 float filterMemory [] = {0, 0, 0, 0, 0};
 int adc_val;
 float filtered_adc;
 float mathResults [MATH_ARRAY_SIZE];
 extern uint8_t systickFlag;
-extern uint8_t buttonFlag;
+//extern uint8_t buttonFlag;
 
 float dispNum = 0;
 int padEntries [] = {0, 0, 0, 0};
 int padVal = 0;
 int padFlag = 0;
+int holdingFlag = 0;
 
 int state = WKEY1;
 
@@ -270,6 +268,18 @@ int main(void)
 			
 			case DISPLAY:
 				
+				if (padVal == 11 && padFlag == 0){
+					padFlag = 1;
+				}
+				else if (padVal == -1){
+					if (padFlag == 1){
+						padFlag = 0;
+						padEntries[0] = 0;
+						padEntries [1] = 0;
+						state = WKEY1;
+					}
+				}
+				
 				if(systickFlag == 1){			
 					
 					systickFlag = 0;
@@ -284,16 +294,12 @@ int main(void)
 					sample ++;
 					sample = sample % sampleNB;
 				}
-				if ( buttonFlag == 1){
-					buttonFlag = 0;
-					displayMode = displayMode + 1;
-					displayMode = displayMode % 3;
-					printf("displayMode = %d \n!", displayMode);
-				}
-	
+				
 				C_math (&data[0], &mathResults [0], sampleNB);                //perform math operation on data to get RMS, min and max values
 				
-				display (displayMode, mathResults [displayMode]);
+				display (0, mathResults [0]);
+				
+				
 				
 			break;
 			
