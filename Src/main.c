@@ -121,6 +121,8 @@ void C_math (float * inputArray, float * outputArray, int length);
 void display (int mode, float num);
 int readPad (void);
 void updateEnt (int newEnt);
+void pwmSetValue(uint16_t pulseValue);
+	
 
 /* USER CODE END PFP */
 
@@ -210,6 +212,7 @@ int main(void)
 		
 		if (padVal == 10){
 				holdingFlag = 1;
+			
 				if (holdCount > 3000){
 					holdingFlag = 0;
 					holdCount = 0;
@@ -228,6 +231,12 @@ int main(void)
 		
 		switch (state){
 			
+			/*
+			*
+			*STATE 1 : WAIT FOR FIRST DIGIT INPUT
+			*
+			*/
+			
 			case WKEY1:
 				display (-1, dispNum);
 				if (padVal >= 0 && padVal < 10 && padFlag == 0){
@@ -240,6 +249,13 @@ int main(void)
 				}
 			break;
 			
+				
+			/*
+			*
+			*STATE 2 : WAIT FOR SECOND DIGIT INPUT
+			*
+			*/
+				
 			case WKEY2:
 				display (-1, dispNum);
 				if (padVal >= 0 && padVal < 10 && padFlag == 0){
@@ -262,6 +278,13 @@ int main(void)
 				}
 			break;
 			
+				
+			/*
+			*
+			*STATE 3 : WAIT FOR ENTER PRESS TO CONTINUE
+			*
+			*/
+				
 			case WENTER:
 				display (-1, dispNum);
 				if (padVal == 11 && padFlag == 0){
@@ -274,6 +297,9 @@ int main(void)
 				else if (padVal == -1){
 					if (padFlag == 1){
 						padFlag = 0;
+						
+						//TEST
+						pwmSetValue (5);
 						state = DISPLAY;
 					}
 					else if (padFlag == -1){
@@ -283,6 +309,14 @@ int main(void)
 				}
 			break;
 			
+				
+			/*
+			*
+			*STATE 4 : VOLTMETER DISPLAY
+			*
+			*/
+				
+				
 			case DISPLAY:
 				
 				if (padVal == 11 && padFlag == 0){
@@ -304,9 +338,9 @@ int main(void)
 					HAL_ADC_Start_IT(&hadc1);
 					adc_val = HAL_ADC_GetValue(&hadc1);
 					
-					float test = (float)adc_val*3.0/1023.0;
-					FIR_C(test, &filtered_adc);             //filter ADC value
-					data [sample] = filtered_adc;           //store filtered data in array
+					float test = (float)(adc_val*3.0/4096.0);    //12 bit resolution so we need to divide by 2^12 !!
+					FIR_C(test, &filtered_adc);                  //filter ADC value
+					data [sample] = filtered_adc;                //store filtered data in array
 				
 					sample ++;
 					sample = sample % sampleNB;
@@ -318,6 +352,14 @@ int main(void)
 				
 			break;
 			
+				
+			/*
+			*
+			*STATE 5 : SLEEP MODE
+			*
+			*/
+				
+				
 			case SLEEP:
 				if (padVal == 11 && padFlag == 0){
 					padFlag = 1;
@@ -1127,6 +1169,22 @@ void updateEnt (int newEnt) {
 	}
 	padEntries [0] = newEnt;
 }
+
+
+
+void pwmSetValue(uint16_t pulseValue) {
+	
+		TIM_OC_InitTypeDef sConfigOC;
+  
+    sConfigOC.OCMode = TIM_OCMODE_PWM1;
+    sConfigOC.Pulse = pulseValue;
+    sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+    sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+	
+    HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1);
+    HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);  
+}
+
 
 
 /* USER CODE END 4 */
