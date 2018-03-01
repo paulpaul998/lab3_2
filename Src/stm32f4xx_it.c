@@ -41,6 +41,9 @@ uint8_t systickFlag;
 uint8_t buttonFlag;
 int ms_counter = 0;
 
+extern int holdingFlag;
+extern int holdCount;
+
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
@@ -63,6 +66,9 @@ void SysTick_Handler(void)
 		systickFlag = 1;
 	}
 	
+	if(holdingFlag == 1){
+		holdCount++;
+	}
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   HAL_SYSTICK_IRQHandler();

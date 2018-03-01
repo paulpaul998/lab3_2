@@ -92,6 +92,7 @@ int padEntries [] = {0, 0, 0, 0};
 int padVal = 0;
 int padFlag = 0;
 int holdingFlag = 0;
+int holdCount = 0;
 
 int state = WKEY1;
 
@@ -204,10 +205,26 @@ int main(void)
 		HAL_Delay(2);
 		*/
 		
-		
-		
 		padVal = readPad();
 		dispNum = padEntries[0] + ((float)padEntries[1]/10);
+		
+		if (padVal == 10){
+				holdingFlag = 1;
+				if (holdCount > 3000){
+					holdingFlag = 0;
+					holdCount = 0;
+					padFlag = 0;
+					
+					displayNum (-1, -1);   //clear display
+					
+					state = SLEEP;
+				}
+		}
+		else {
+				holdingFlag = 0;
+				holdCount = 0;
+		}
+		
 		
 		switch (state){
 			
@@ -299,12 +316,20 @@ int main(void)
 				
 				display (0, mathResults [0]);
 				
-				
-				
 			break;
 			
 			case SLEEP:
-				
+				if (padVal == 11 && padFlag == 0){
+					padFlag = 1;
+				}
+				else if (padVal == -1){
+					if (padFlag == 1){
+						padFlag = 0;
+						padEntries[0] = 0;     //reset pad entries
+						padEntries[1] = 0;
+						state = WKEY1;
+					}
+				}
 			break;
 			
 			default :
@@ -950,6 +975,14 @@ void displayNum (int num, int pos) {       //function used to diplay a single di
 				HAL_GPIO_WritePin(GPIOE, Dig_L_Pin, GPIO_PIN_RESET);
 				HAL_GPIO_WritePin(GPIOE, Dig_3_Pin, GPIO_PIN_RESET);
 				HAL_GPIO_WritePin(GPIOE, Dig_4_Pin, GPIO_PIN_SET);
+				HAL_GPIO_WritePin(GPIOB, Seg_DP_Pin, GPIO_PIN_RESET);
+			break;
+			case -1 :
+				HAL_GPIO_WritePin(GPIOE, Dig_1_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOE, Dig_2_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOE, Dig_L_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOE, Dig_3_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOE, Dig_4_Pin, GPIO_PIN_RESET);
 				HAL_GPIO_WritePin(GPIOB, Seg_DP_Pin, GPIO_PIN_RESET);
 			break;
 			default :
