@@ -68,7 +68,7 @@ TIM_HandleTypeDef htim3;
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 
-int sampleNB = 100; //CHANGE FOR SAMPLE NUMBER
+int sampleNB = 40; //CHANGE FOR SAMPLE NUMBER
 int sample = 0;
 
 uint16_t dutyCycle = 10;
@@ -79,6 +79,9 @@ uint16_t dutyCycle = 10;
 #define WENTER 2
 #define DISPLAY 3
 #define SLEEP 4
+
+int correctCounter=0;
+int correctPeriod = 1;
 
 int displayMode = 0;
 float filterMemory [] = {0, 0, 0, 0, 0};
@@ -91,10 +94,13 @@ extern uint8_t systickFlag;
 float dispNum = 0;
 int padEntries [] = {0, 0, 0, 0};
 int padVal = 0;
+
 int padFlag = 0;
 int holdingFlag = 0;
+int correctFlag = 0;
+
 int holdCount = 0;
-int highPeriods = 50;
+int highPeriods = 10;
 int state = WKEY1;
 
 /* USER CODE END PV */
@@ -123,7 +129,7 @@ void display (int mode, float num);
 int readPad (void);
 void updateEnt (int newEnt);
 void pwmSetValue(uint16_t pulseValue);
-void set_highPeriods(float dispNum, float * outputarray, int current_period);
+void set_highPeriods(int current_period);
 	
 
 /* USER CODE END PFP */
@@ -318,7 +324,7 @@ int main(void)
 				
 				
 			case DISPLAY:
-				
+				correctCounter ++;
 				if (padVal == 11 && padFlag == 0){
 					padFlag = 1;
 				}
@@ -347,7 +353,11 @@ int main(void)
 				}
 				
 				C_math (&data[0], &mathResults [0], sampleNB);                //perform math operation on data to get RMS, min and max values
-				set_highPeriods( dispNum, mathResults, highPeriods);
+				
+				if (correctCounter > correctPeriod){
+					correctCounter = 0;
+					set_highPeriods(highPeriods);
+				}
 				htim3.Instance->CCR1 = highPeriods;									// sets the number of periods that the pwm wave is set to high
 				display (0, mathResults [0]);
 				
@@ -1178,12 +1188,13 @@ void updateEnt (int newEnt) {
 	padEntries [0] = newEnt;
 }
 
-void set_highPeriods(float dispNum, float * outputarray, int current_period){
+void set_highPeriods(int current_period){
 
 	float p_control = 1;
 	float proportionGain;
-	float rms = outputarray[0];
-	
+	float rms = mathResults [0];
+	float diff = dispNum - rms;
+	/*
 	proportionGain = p_control * ( dispNum - rms ) / rms;
 	current_period = ( current_period * ( 1 + proportionGain ) );
 
@@ -1193,6 +1204,36 @@ void set_highPeriods(float dispNum, float * outputarray, int current_period){
 	else if( current_period <= 0 ){
 		current_period = 0;
 	}
+	highPeriods = (int)current_period;
+	
+	*/
+	
+	if(diff > 0){
+		current_period += 1;
+		if( current_period >= 100 ){
+			current_period = 100;
+		}
+	}
+	else if (diff < 0){
+		
+		current_period -= 1;
+		if( current_period <= 0 ){
+			current_period = 0;
+		}
+	}
+	
+	
+	if(diff < 0.2){
+		correctPeriod = 20;
+	}
+	else if(diff < 0.1){
+		correctPeriod = 3000;
+	}
+	else if (diff < 0.05){
+		correctPeriod = 50000;
+	}
+	
+	
 	highPeriods = (int)current_period;
 }
 

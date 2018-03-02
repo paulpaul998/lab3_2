@@ -40,9 +40,11 @@
 uint8_t systickFlag;
 uint8_t buttonFlag;
 int ms_counter = 0;
+//int correctCounter;
 
 extern int holdingFlag;
 extern int holdCount;
+extern int correctFlag;
 
 /* USER CODE END 0 */
 
@@ -61,10 +63,19 @@ void SysTick_Handler(void)
   /* USER CODE BEGIN SysTick_IRQn 0 */
 	
 	ms_counter = ms_counter + 1;
+	//correctCounter += 1;
+	
 	if ( ms_counter >= 20 ){
 		ms_counter = 0;
 		systickFlag = 1;
 	}
+	
+	/*
+	if (correctCounter >= 200 ){
+		correctCounter = 0;
+		correctFlag = 1;
+	}
+	*/
 	
 	if(holdingFlag == 1){
 		holdCount++;

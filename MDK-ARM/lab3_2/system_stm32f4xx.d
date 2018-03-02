@@ -2,7 +2,7 @@ lab3_2\system_stm32f4xx.o: ../Src/system_stm32f4xx.c
 lab3_2\system_stm32f4xx.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h
 lab3_2\system_stm32f4xx.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h
 lab3_2\system_stm32f4xx.o: ../Drivers/CMSIS/Include/core_cm4.h
-lab3_2\system_stm32f4xx.o: C:\Core\ARM\ARMCC\Bin\..\include\stdint.h
+lab3_2\system_stm32f4xx.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 lab3_2\system_stm32f4xx.o: ../Drivers/CMSIS/Include/core_cmInstr.h
 lab3_2\system_stm32f4xx.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
 lab3_2\system_stm32f4xx.o: ../Drivers/CMSIS/Include/core_cmFunc.h
@@ -15,7 +15,7 @@ lab3_2\system_stm32f4xx.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc
 lab3_2\system_stm32f4xx.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h
 lab3_2\system_stm32f4xx.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h
 lab3_2\system_stm32f4xx.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h
-lab3_2\system_stm32f4xx.o: C:\Core\ARM\ARMCC\Bin\..\include\stdio.h
+lab3_2\system_stm32f4xx.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 lab3_2\system_stm32f4xx.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h
 lab3_2\system_stm32f4xx.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h
 lab3_2\system_stm32f4xx.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h
