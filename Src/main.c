@@ -63,6 +63,7 @@ I2S_HandleTypeDef hi2s3;
 
 SPI_HandleTypeDef hspi1;
 
+TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 
 /* USER CODE BEGIN PV */
@@ -79,6 +80,7 @@ uint16_t dutyCycle = 10;
 #define WENTER 2
 #define DISPLAY 3
 #define SLEEP 4
+#define samplesize 40
 
 int correctCounter=0;
 int correctPeriod = 5;
@@ -103,6 +105,8 @@ int holdCount = 0;
 int highPeriods = 100;
 int state = WKEY1;
 
+float data [samplesize];
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -113,6 +117,7 @@ static void MX_I2S3_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM3_Init(void);
+static void MX_TIM2_Init(void);
 void MX_USB_HOST_Process(void);
 
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
@@ -148,16 +153,6 @@ int main(void)
   /* USER CODE BEGIN 1 */
 	
 	
-	float data [sampleNB];
-	
-	
-	
-	
-	
-	
-	
-	
-	
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -184,9 +179,12 @@ int main(void)
   MX_USB_HOST_Init();
   MX_ADC1_Init();
   MX_TIM3_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+	HAL_TIM_Base_Start(&htim2);
+	HAL_ADC_Start_IT(&hadc1);
 	
 
   /* USER CODE END 2 */
@@ -337,20 +335,6 @@ int main(void)
 					}
 				}
 				
-				if(systickFlag == 1){			
-					
-					systickFlag = 0;
-					
-					HAL_ADC_Start_IT(&hadc1);
-					adc_val = HAL_ADC_GetValue(&hadc1);
-					
-					float test = (float)(adc_val*3.0/4096.0);    //12 bit resolution so we need to divide by 2^12 !!
-					FIR_C(test, &filtered_adc);                  //filter ADC value
-					data [sample] = filtered_adc;                //store filtered data in array
-				
-					sample ++;
-					sample = sample % sampleNB;
-				}
 				
 				C_math (&data[0], &mathResults [0], sampleNB);                //perform math operation on data to get RMS, min and max values
 				
@@ -531,8 +515,8 @@ static void MX_ADC1_Init(void)
   hadc1.Init.ScanConvMode = DISABLE;
   hadc1.Init.ContinuousConvMode = DISABLE;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
-  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
-  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_RISING;
+  hadc1.Init.ExternalTrigConv = ADC_EXTERNALTRIGCONV_T2_TRGO;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc1.Init.NbrOfConversion = 1;
   hadc1.Init.DMAContinuousRequests = DISABLE;
@@ -612,6 +596,38 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
   hspi1.Init.CRCPolynomial = 10;
   if (HAL_SPI_Init(&hspi1) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+}
+
+/* TIM2 init function */
+static void MX_TIM2_Init(void)
+{
+
+  TIM_ClockConfigTypeDef sClockSourceConfig;
+  TIM_MasterConfigTypeDef sMasterConfig;
+
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 82;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 1000;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
@@ -793,6 +809,19 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+
+
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
+{
+		adc_val = HAL_ADC_GetValue(&hadc1);
+		float test = (float)(adc_val*3.0/4096.0);    //12 bit resolution so we need to divide by 2^12 !!
+		FIR_C(test, &filtered_adc);                  //filter ADC value
+		data [sample] = filtered_adc;                //store filtered data in array
+		sample ++;
+		sample = sample % sampleNB;
+}
+
 
 
 /**
