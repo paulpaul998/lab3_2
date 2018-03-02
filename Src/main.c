@@ -71,6 +71,7 @@ TIM_HandleTypeDef htim3;
 int sampleNB = 100; //CHANGE FOR SAMPLE NUMBER
 int sample = 0;
 
+uint16_t dutyCycle = 10;
 
 #define MATH_ARRAY_SIZE 5
 #define WKEY1 0
@@ -176,11 +177,10 @@ int main(void)
   MX_USB_HOST_Init();
   MX_ADC1_Init();
   MX_TIM3_Init();
-	
   /* USER CODE BEGIN 2 */
 
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
-
+	htim3.Instance->CCR1 = 99;
 
   /* USER CODE END 2 */
 
@@ -299,7 +299,7 @@ int main(void)
 						padFlag = 0;
 						
 						//TEST
-						pwmSetValue (5);
+						//pwmSetValue (5);
 						state = DISPLAY;
 					}
 					else if (padFlag == -1){
@@ -427,7 +427,14 @@ int main(void)
     MX_USB_HOST_Process();
 
   /* USER CODE BEGIN 3 */
-
+//	htim3.Instance->CCR1 = dutyCycle;
+//	
+//	dutyCycle+= 10;
+//	if (dutyCycle = 90) {
+//		
+//		dutyCycle = 10;
+//	}
+//	HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 
@@ -609,9 +616,9 @@ static void MX_TIM3_Init(void)
   TIM_OC_InitTypeDef sConfigOC;
 
   htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 1;
+  htim3.Init.Prescaler = 42;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 65535;
+  htim3.Init.Period = 100;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
   {
@@ -637,7 +644,7 @@ static void MX_TIM3_Init(void)
   }
 
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 5;
+  sConfigOC.Pulse = 50;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
@@ -1172,6 +1179,7 @@ void updateEnt (int newEnt) {
 
 
 
+/*
 void pwmSetValue(uint16_t pulseValue) {
 	
 		TIM_OC_InitTypeDef sConfigOC;
@@ -1184,7 +1192,7 @@ void pwmSetValue(uint16_t pulseValue) {
     HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1);
     HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);  
 }
-
+*/
 
 
 /* USER CODE END 4 */

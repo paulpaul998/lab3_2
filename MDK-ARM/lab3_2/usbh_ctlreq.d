@@ -2,13 +2,13 @@ lab3_2\usbh_ctlreq.o: ../Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_ctl
 lab3_2\usbh_ctlreq.o: ../Middlewares/ST/STM32_USB_Host_Library/Core/Inc/usbh_ctlreq.h
 lab3_2\usbh_ctlreq.o: ../Middlewares/ST/STM32_USB_Host_Library/Core/Inc/usbh_core.h
 lab3_2\usbh_ctlreq.o: ../Inc/usbh_conf.h
-lab3_2\usbh_ctlreq.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
-lab3_2\usbh_ctlreq.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
-lab3_2\usbh_ctlreq.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+lab3_2\usbh_ctlreq.o: C:\Core\ARM\ARMCC\Bin\..\include\stdio.h
+lab3_2\usbh_ctlreq.o: C:\Core\ARM\ARMCC\Bin\..\include\stdlib.h
+lab3_2\usbh_ctlreq.o: C:\Core\ARM\ARMCC\Bin\..\include\string.h
 lab3_2\usbh_ctlreq.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h
 lab3_2\usbh_ctlreq.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h
 lab3_2\usbh_ctlreq.o: ../Drivers/CMSIS/Include/core_cm4.h
-lab3_2\usbh_ctlreq.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+lab3_2\usbh_ctlreq.o: C:\Core\ARM\ARMCC\Bin\..\include\stdint.h
 lab3_2\usbh_ctlreq.o: ../Drivers/CMSIS/Include/core_cmInstr.h
 lab3_2\usbh_ctlreq.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
 lab3_2\usbh_ctlreq.o: ../Drivers/CMSIS/Include/core_cmFunc.h
