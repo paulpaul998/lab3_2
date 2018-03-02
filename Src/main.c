@@ -1194,19 +1194,7 @@ void set_highPeriods(int current_period){
 	float proportionGain;
 	float rms = mathResults [0];
 	float diff = dispNum - rms;
-	/*
-	proportionGain = p_control * ( dispNum - rms ) / rms;
-	current_period = ( current_period * ( 1 + proportionGain ) );
 
-	if( current_period >= 100 ){
-		current_period = 100;
-	}
-	else if( current_period <= 0 ){
-		current_period = 0;
-	}
-	highPeriods = (int)current_period;
-	
-	*/
 	if (dispNum < 1.4){
 			if(diff > 0){
 				if (diff > 0.5){
@@ -1238,6 +1226,8 @@ void set_highPeriods(int current_period){
 				}
 			}
 	}
+	
+	
 	else {
 		if(diff > 0){
 				if (diff > 0.5){
