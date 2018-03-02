@@ -81,7 +81,7 @@ uint16_t dutyCycle = 10;
 #define SLEEP 4
 
 int correctCounter=0;
-int correctPeriod = 1;
+int correctPeriod = 5;
 
 int displayMode = 0;
 float filterMemory [] = {0, 0, 0, 0, 0};
@@ -100,7 +100,7 @@ int holdingFlag = 0;
 int correctFlag = 0;
 
 int holdCount = 0;
-int highPeriods = 10;
+int highPeriods = 100;
 int state = WKEY1;
 
 /* USER CODE END PV */
@@ -629,7 +629,7 @@ static void MX_TIM3_Init(void)
   htim3.Instance = TIM3;
   htim3.Init.Prescaler = 42;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 100;
+  htim3.Init.Period = 1000;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
   {
@@ -1207,32 +1207,82 @@ void set_highPeriods(int current_period){
 	highPeriods = (int)current_period;
 	
 	*/
-	
-	if(diff > 0){
-		current_period += 1;
-		if( current_period >= 100 ){
-			current_period = 100;
-		}
+	if (dispNum < 1.4){
+			if(diff > 0){
+				if (diff > 0.5){
+					current_period += 20;
+				}
+				if (diff > 0.2){
+					current_period += 10;
+				}
+				else{
+					current_period += 1;
+				}
+				if( current_period >= 1000 ){
+					current_period = 1000;
+				}
+			}
+			else if (diff < 0){
+				if (diff < -0.5){
+					current_period -= 20;
+				}
+				if (diff < -0.2){
+					current_period -= 10;
+				}
+				else{
+					current_period -= 1;
+				}
+				current_period -= 1;
+				if( current_period <= 0 ){
+					current_period = 0;
+				}
+			}
 	}
-	else if (diff < 0){
+	else {
+		if(diff > 0){
+				if (diff > 0.5){
+					current_period += 40;
+				}
+				if (diff > 0.2){
+					current_period += 40;
+				}
+				else{
+					current_period += 10;
+				}
+				if( current_period >= 1000 ){
+					current_period = 1000;
+				}
+			}
+			else if (diff < 0){
+				if (diff < -0.5){
+					current_period -= 20;
+				}
+				if (diff < -0.2){
+					current_period -= 10;
+				}
+				else{
+					current_period -= 1;
+				}
+				current_period -= 1;
+				if( current_period <= 0 ){
+					current_period = 0;
+				}
+			}
 		
-		current_period -= 1;
-		if( current_period <= 0 ){
-			current_period = 0;
-		}
 	}
 	
 	
-	if(diff < 0.2){
+	
+	
+	if(diff*diff < 0.04){
 		correctPeriod = 20;
 	}
-	else if(diff < 0.1){
+	else if(diff*diff < 0.01){
 		correctPeriod = 3000;
 	}
-	else if (diff < 0.05){
-		correctPeriod = 50000;
+	else{
+		correctPeriod = 10;
 	}
-	
 	
 	highPeriods = (int)current_period;
 }

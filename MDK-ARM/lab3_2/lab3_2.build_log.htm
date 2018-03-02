@@ -28,20 +28,28 @@ Project File Date:  03/01/2018
 *** Using Compiler 'V5.06 update 5 (build 528)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'lab3_2'
 compiling main.c...
-../Src/main.c(1226): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  	if(diff < 0.2){
-../Src/main.c(1229): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  	else if(diff < 0.1){
-../Src/main.c(1232): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  	else if (diff < 0.05){
+../Src/main.c(1210): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	if (dispNum < 1.4){
+../Src/main.c(1212): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  				if (diff > 0.5){
+../Src/main.c(1215): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  				if (diff > 0.2){
+../Src/main.c(1243): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  				if (diff > 0.5){
+../Src/main.c(1246): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  				if (diff > 0.2){
+../Src/main.c(1277): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	if(diff*diff < 0.04){
+../Src/main.c(1280): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	else if(diff*diff < 0.01){
 ../Src/main.c(1193): warning:  #177-D: variable "p_control"  was declared but never referenced
   	float p_control = 1;
 ../Src/main.c(1194): warning:  #177-D: variable "proportionGain"  was declared but never referenced
   	float proportionGain;
-../Src/main.c: 5 warnings, 0 errors
+../Src/main.c: 9 warnings, 0 errors
 linking...
-Program Size: Code=27992 RO-data=520 RW-data=136 ZI-data=3600  
-"lab3_2\lab3_2.axf" - 0 Error(s), 5 Warning(s).
+Program Size: Code=28368 RO-data=520 RW-data=136 ZI-data=3600  
+"lab3_2\lab3_2.axf" - 0 Error(s), 9 Warning(s).
 
 <h2>Software Packages used:</h2>
 

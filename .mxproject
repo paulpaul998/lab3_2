@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=C:/Users/pauli/Documents/GitHub/G13_LAB3/lab3_2/Inc
+HeaderPath=C:/Users/Clem/Desktop/lab3_2/Inc
 HeaderFiles=usb_host.h;usbh_conf.h;usbh_platform.h;stm32f4xx_it.h;stm32f4xx_hal_conf.h;main.h;
-SourcePath=C:/Users/pauli/Documents/GitHub/G13_LAB3/lab3_2/Src
+SourcePath=C:/Users/Clem/Desktop/lab3_2/Src
 SourceFiles=usb_host.c;usbh_conf.c;usbh_platform.c;stm32f4xx_it.c;stm32f4xx_hal_msp.c;main.c;
 
 [PreviousLibFiles]
