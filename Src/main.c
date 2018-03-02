@@ -794,6 +794,13 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
+
+/**
+  * @brief  This function probes the keyPad
+	* @param  None
+	* @retval Returns the value pressed by the user (0-9, 10 for the * button, 11 for the # button)
+  */
+
 int readPad (){
 	
 	int keymap[4][3]=
@@ -1180,6 +1187,12 @@ void display (int mode, float num){     //
 	}
 }
 
+/**
+  * @brief  This update the padEntries table that stores the digits pad inputs
+	* @param  newEnt : newly inputted digit
+  * @retval None
+  */
+
 void updateEnt (int newEnt) {
 	
 	for (int i = 3; i>0; i--){
@@ -1187,6 +1200,14 @@ void updateEnt (int newEnt) {
 	}
 	padEntries [0] = newEnt;
 }
+
+
+
+/**
+  * @brief  This is the controller function. It adjusts the PWM duty cycle according to the desired value
+	* @param  current_period : the current duty cycle of the PWM
+  * @retval None
+  */
 
 void set_highPeriods(int current_period){
 
@@ -1276,22 +1297,6 @@ void set_highPeriods(int current_period){
 	
 	highPeriods = (int)current_period;
 }
-
-/*
-void pwmSetValue(uint16_t pulseValue) {
-	
-		TIM_OC_InitTypeDef sConfigOC;
-  
-    sConfigOC.OCMode = TIM_OCMODE_PWM1;
-    sConfigOC.Pulse = pulseValue;
-    sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-    sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-	
-    HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1);
-    HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);  
-}
-*/
-
 
 /* USER CODE END 4 */
 
