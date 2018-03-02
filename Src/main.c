@@ -94,7 +94,7 @@ int padVal = 0;
 int padFlag = 0;
 int holdingFlag = 0;
 int holdCount = 0;
-
+int highPeriods = 50;
 int state = WKEY1;
 
 /* USER CODE END PV */
@@ -123,6 +123,7 @@ void display (int mode, float num);
 int readPad (void);
 void updateEnt (int newEnt);
 void pwmSetValue(uint16_t pulseValue);
+void set_highPeriods(float dispNum, float * outputarray, int current_period);
 	
 
 /* USER CODE END PFP */
@@ -180,7 +181,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
-	htim3.Instance->CCR1 = 99;
+	
 
   /* USER CODE END 2 */
 
@@ -298,8 +299,7 @@ int main(void)
 					if (padFlag == 1){
 						padFlag = 0;
 						
-						//TEST
-						//pwmSetValue (5);
+						
 						state = DISPLAY;
 					}
 					else if (padFlag == -1){
@@ -347,7 +347,8 @@ int main(void)
 				}
 				
 				C_math (&data[0], &mathResults [0], sampleNB);                //perform math operation on data to get RMS, min and max values
-				
+				set_highPeriods( dispNum, mathResults, highPeriods);
+				htim3.Instance->CCR1 = highPeriods;									// sets the number of periods that the pwm wave is set to high
 				display (0, mathResults [0]);
 				
 			break;
@@ -1177,7 +1178,23 @@ void updateEnt (int newEnt) {
 	padEntries [0] = newEnt;
 }
 
+void set_highPeriods(float dispNum, float * outputarray, int current_period){
 
+	float p_control = 1;
+	float proportionGain;
+	float rms = outputarray[0];
+	
+	proportionGain = p_control * ( dispNum - rms ) / rms;
+	current_period = ( current_period * ( 1 + proportionGain ) );
+
+	if( current_period >= 100 ){
+		current_period = 100;
+	}
+	else if( current_period <= 0 ){
+		current_period = 0;
+	}
+	highPeriods = (int)current_period;
+}
 
 /*
 void pwmSetValue(uint16_t pulseValue) {
